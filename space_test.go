@@ -33,7 +33,7 @@ func (b *MyBox) GetTestSpace() *MySpace {
 	return b.InitSpace("tnt_space", spaceFactory).(*MySpace)
 }
 
-func TestGetSpace(t *testing.T) {
+func TestSpaceGetAndSelect(t *testing.T) {
 	box, _ := GetBox("test", myBoxFactory).(*MyBox)
 	space := box.GetTestSpace()
 
@@ -48,10 +48,31 @@ func TestGetSpace(t *testing.T) {
 	records, err := space.Select(Cursor{})
 
 	if err != nil {
-		t.Error("space.Select.err:", err)
+		t.Error("space.Select().err:", err)
 	}
 
 	if len(records) != 2 {
 		t.Errorf("len(records): %d != 2", len(records))
+	}
+}
+
+func TestSpaceSelecOne(t *testing.T) {
+	box, _ := GetBox("test", myBoxFactory).(*MyBox)
+	space := box.GetTestSpace()
+
+	rec, err := space.SelectOne(Cursor{
+		Where: 2,
+	})
+
+	if err != nil {
+		t.Error("space.SelectOne().err:", err)
+	}
+
+	if !rec.IsExists() {
+		t.Error("space.SelectOne(): not exists")
+	}
+
+	if rec.Id != 2 {
+		t.Errorf("space.SelectOne().Id: %d != 2", rec.Id)
 	}
 }
