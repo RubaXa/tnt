@@ -19,14 +19,13 @@ func (s *MySpace) Select(c Cursor) ([]*Record, error) {
 }
 
 func (s *MySpace) SelectOne(c Cursor) (*Record, error) {
-	c.Limit = 1
 	c.Iterator = IterEq
 	entry, err := s.exec(c).First()
 	return entry.(*Record), err
 }
 
 var spaceFactory = func() (Index, ISpace) {
-	return "primary", &MySpace{}
+	return Index("primary"), &MySpace{}
 }
 
 func (b *MyBox) GetTestSpace() *MySpace {
@@ -61,7 +60,7 @@ func TestSpaceSelecOne(t *testing.T) {
 	space := box.GetTestSpace()
 
 	rec, err := space.SelectOne(Cursor{
-		Where: 2,
+		Key: 2,
 	})
 
 	if err != nil {
@@ -74,5 +73,26 @@ func TestSpaceSelecOne(t *testing.T) {
 
 	if rec.Id != 2 {
 		t.Errorf("space.SelectOne().Id: %d != 2", rec.Id)
+	}
+}
+
+func TestSpaceSelecOneNotExists(t *testing.T) {
+	box, _ := GetBox("test", myBoxFactory).(*MyBox)
+	space := box.GetTestSpace()
+
+	rec, err := space.SelectOne(Cursor{
+		Key: 666,
+	})
+
+	if err != nil {
+		t.Error("space.SelectOne().err:", err)
+	}
+
+	if rec.IsExists() {
+		t.Error("space.SelectOne(): exists?!")
+	}
+
+	if rec.Id != 0 {
+		t.Errorf("space.SelectOne().Id: %d != 0", rec.Id)
 	}
 }

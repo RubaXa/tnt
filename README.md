@@ -29,7 +29,7 @@ type Box struct {
 
 func (b *Box) UsersSpace() (*UsersSpace, err) {
 	return b.GetSpace("users", func () (tnt.Index, tnt.ISpace) {
-		return "primary", &UsersSpace{
+		return tnt.Index("primary"), &UsersSpace{
 			EmailIdx: "email",
 		}
 	}).(*UsersSpace)
@@ -72,12 +72,12 @@ func main() {
 	usersSpace, err := db.Get().UsersSpace()
 
 	user, err := usersSpace.SelectOne(&db.Cursor{
-		Where: 123,
+		Key: 123,
 	})
 
 	usersByEmail, err := usersSpace.Select(&db.Cursor{
 		Index: usersSpace.EmailIdx,
-		Where: "xxx@yyy.zzz",
+		Key: "xxx@yyy.zzz",
 	})
 }
 ```

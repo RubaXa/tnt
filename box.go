@@ -83,10 +83,10 @@ func (b *Box) Select(s string, c Cursor, next NextEntry) *LazyResult {
 		c.Limit = 1
 	}
 
-	where := []interface{}{}
+	key := []interface{}{}
 
-	if c.Where != nil {
-		where = append(where, c.Where)
+	if c.Key != nil {
+		key = append(key, c.Key)
 	}
 
 	future := b.conn.SelectAsync(
@@ -95,7 +95,7 @@ func (b *Box) Select(s string, c Cursor, next NextEntry) *LazyResult {
 		c.Offset,
 		c.Limit,
 		c.Iterator,
-		where,
+		key,
 	)
 
 	return &LazyResult{
